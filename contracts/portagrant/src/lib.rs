@@ -199,6 +199,14 @@ mod portagrant {
         }
 
         #[ink(message)]
+        pub fn get_milestones(&self, grant_id: u64) -> Option<Vec<Milestone>> {
+            let grant = self.grants.get(grant_id)?;
+            (0..grant.milestone_count)
+                .map(|milestone| self.milestones.get((grant_id, milestone)))
+                .collect()
+        }
+
+        #[ink(message)]
         pub fn get_milestone(&self, grant_id: u64, milestone: u32) -> Option<Milestone> {
             self.milestones.get((grant_id, milestone))
         }
@@ -223,6 +231,25 @@ mod portagrant {
             let grant = contract.get_grant(id).expect("grant missing");
             assert_eq!(grant.builder, builder);
             assert_eq!(grant.released_count, 0);
+        }
+
+        #[ink::test]
+        fn reads_all_milestones_for_a_grant() {
+            let (sponsor, builder) = accounts();
+            test::set_caller::<ink::env::DefaultEnvironment>(sponsor);
+            test::set_value_transferred::<ink::env::DefaultEnvironment>(150);
+            let mut contract = PortaGrant::new();
+            let id = contract.create_grant(
+                builder,
+                vec![String::new(), String::new()],
+                vec![100, 50],
+            );
+            let milestones = contract.get_milestones(id).unwrap();
+            assert_eq!(milestones.len(), 2);
+            assert!(milestones[0].title.is_empty());
+            assert_eq!(milestones[0].amount, 100);
+            assert_eq!(milestones[1].amount, 50);
+            assert!(contract.get_milestones(id + 1).is_none());
         }
 
         #[ink::test]

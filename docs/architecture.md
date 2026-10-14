@@ -28,6 +28,10 @@ Frontend dashboard ── injected provider / RPC ──► PortaGrant ink! cont
 5. A milestone can be released once; the contract marks the grant `Completed` only after all releases.
 6. No private key or seed phrase is handled by the frontend or committed to the repository.
 
+## Read integration
+
+`get_grant` returns the grant-level escrow state, while `get_milestones` returns every milestone in its stored order. The Node `npm run inspect` helper queries both methods and prints one JSON document, so dashboards and indexers do not need to infer the milestone count or issue one RPC call per milestone.
+
 ## Extension path
 
 - Replace evidence strings with content-addressed hashes and optional IPFS/Arweave links.
