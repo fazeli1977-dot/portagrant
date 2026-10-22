@@ -51,6 +51,10 @@ cargo +1.88.0 contract build -Z original-manifest --generate all
 
 ## Run the demo
 
+Run the dependency-free read-helper regression tests with `npm test --prefix scripts`.
+`GRANT_ID` accepts unsigned decimal IDs across the full contract `u64` range;
+the read helper validates input before connecting and disconnects after query failures.
+
 ```powershell
 cd frontend
 python -m http.server 4173

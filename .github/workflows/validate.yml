@@ -29,3 +29,5 @@ jobs:
       - run: node --check frontend/app.js
       - run: node --check scripts/deploy.mjs
       - run: node --check scripts/inspect.mjs
+      - run: node --check scripts/inspect-grant.mjs
+      - run: npm test --prefix scripts
