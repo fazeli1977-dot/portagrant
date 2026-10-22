@@ -2,6 +2,6 @@
   "name": "portagrant-scripts",
   "private": true,
   "type": "module",
-  "scripts": { "deploy": "node deploy.mjs", "inspect": "node inspect.mjs", "test": "node --test inspect-grant.test.mjs deploy-transaction.test.mjs ../frontend/app.test.cjs", "validate": "node validate.mjs" },
+  "scripts": { "deploy": "node deploy.mjs", "inspect": "node inspect.mjs", "test": "node --test inspect-grant.test.mjs deploy-transaction.test.mjs deploy-policy.test.mjs ../frontend/app.test.cjs", "validate": "node validate.mjs" },
   "dependencies": { "@polkadot/api": "^15.4.1", "@polkadot/api-contract": "^15.4.1", "@polkadot/keyring": "^13.5.1", "@polkadot/util-crypto": "^13.5.1", "dotenv": "^16.4.7" }
 }
