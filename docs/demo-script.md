@@ -1,13 +1,23 @@
-﻿# Demo video script
+# Presentation script
 
-Target length: 90–150 seconds. Use the live dashboard and show the real testnet transaction hashes after deployment.
+## Available now: local simulation (90 seconds)
 
-1. 0:00–0:15 — Introduce PortaGrant and the Portaldot V3 problem: grants need verifiable milestone releases.
-2. 0:15–0:35 — Show the architecture: wallet → dashboard → ink! WASM contract → Portaldot testnet.
-3. 0:35–0:55 — Create a two-milestone grant and show the exact escrow total.
-4. 0:55–1:15 — Switch to the builder, submit two evidence links, and show the emitted event/hash.
-5. 1:15–1:35 — Switch to the sponsor, approve one milestone, and show the partial release.
-6. 1:35–1:50 — Approve the final milestone and show the on-chain `Completed` state.
-7. 1:50–2:00 — Close with the ecosystem value: reusable grants, bounties, and accelerator funding.
+1. Introduce milestone-based grants and show the architecture document.
+2. Open the dashboard and point out the persistent DEMO MODE label.
+3. Simulate builder evidence for the first milestone, then sponsor approval.
+4. Show remaining illustrative escrow decreasing from 1,200 to 600 POT.
+5. Complete the second milestone and show DEMO COMPLETED and zero remaining escrow.
+6. Reset the grant and check wallet detection; explain that it does not request
+   account access, connect to a chain, sign, or transfer funds.
+7. Show the passing test suite and source code. State that testnet deployment
+   remains pending; do not display invented addresses or transaction hashes.
 
-Do not include seed phrases, private keys, or local `.env` values in the recording.
+## After real deployment
+
+Replace the simulation segment with actual create-grant, builder-evidence,
+sponsor-approval, and completed-state operations using the configured contract
+and a compatible signing interface. Show verified explorer records from
+`docs/deployment.md`. The current browser dashboard does not implement signing.
+
+Never include seed phrases, private keys, RPC credentials, or local `.env`
+values in the recording.

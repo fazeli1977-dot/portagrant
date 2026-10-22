@@ -16,9 +16,14 @@ jobs:
         with:
           components: clippy
           targets: wasm32-unknown-unknown
-      - run: cargo test
-      - run: cargo clippy --all-targets -- -D warnings
-      - run: cargo build --release --target wasm32-unknown-unknown --no-default-features
+      - run: cargo test --locked
+      - run: cargo clippy --locked --all-targets -- -D warnings
+      - run: cargo rustc --lib --locked --release --target wasm32-unknown-unknown --no-default-features --crate-type=cdylib
+      - uses: actions/upload-artifact@v4
+        with:
+          name: portagrant-wasm
+          path: contracts/portagrant/target/wasm32-unknown-unknown/release/portagrant.wasm
+          if-no-files-found: error
   frontend:
     runs-on: ubuntu-latest
     steps:
@@ -30,4 +35,16 @@ jobs:
       - run: node --check scripts/deploy.mjs
       - run: node --check scripts/inspect.mjs
       - run: node --check scripts/inspect-grant.mjs
+      - run: npm ci --ignore-scripts
+        working-directory: scripts
       - run: npm test --prefix scripts
+      - run: node --check scripts/deploy-transaction.mjs
+      - run: node scripts/smoke.mjs
+      - uses: actions/upload-artifact@v4
+        with:
+          name: portagrant-demo
+          path: |
+            frontend/index.html
+            frontend/app.js
+            frontend/styles.css
+          if-no-files-found: error

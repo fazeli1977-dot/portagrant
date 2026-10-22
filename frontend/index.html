@@ -21,25 +21,25 @@
         <p class="eyebrow">MILESTONE ESCROW · PORTALDOT V3</p>
         <h1>Fund builders.<br><em>Unlock progress.</em></h1>
         <p>Transparent grants with evidence-based releases, secured by a WASM smart contract.</p>
-        <button class="primary" id="demo" type="button">Load demo grant</button>
+        <button class="primary" id="demo" type="button">Reset demo grant</button>
         <p class="status" id="status" role="status">Showing an illustrative grant. No transaction has been submitted.</p>
       </div>
-      <div class="orb" aria-label="Two milestones funded"><span>2</span><small>milestones funded</small></div>
+      <div class="orb" aria-label="Simulated milestones released"><span id="released-count">0</span><small>of 2 demo milestones released</small></div>
     </section>
 
     <section class="panel" aria-labelledby="grant-title">
       <div class="panel-head">
-        <div><p class="eyebrow">ACTIVE GRANT #0007</p><h2 id="grant-title">Portaldot Developer Tooling</h2></div>
-        <span class="badge" id="grant-status">ACTIVE</span>
+        <div><p class="eyebrow">ILLUSTRATIVE GRANT #0007</p><h2 id="grant-title">Portaldot Developer Tooling</h2></div>
+        <span class="badge" id="grant-status">DEMO ACTIVE</span>
       </div>
       <div class="meta">
-        <span>Builder <b>5F...a31C</b></span>
-        <span>Escrow <b>1,200 POT</b></span>
-        <span>Network <b>Portaldot testnet</b></span>
+        <span>Builder <b>Example builder (not connected)</b></span>
+        <span>Escrow <b id="escrow">1,200 POT (simulated)</b></span>
+        <span>Network <b>Local simulation</b></span>
       </div>
       <div id="milestones" class="milestones" aria-live="polite"></div>
     </section>
-    <footer>Open source · Verifiable on-chain · Built for Portaldot Hacker House 2026</footer>
+    <footer>Open source · Demo only; no live transactions · Built for Portaldot Hacker House 2026</footer>
   </main>
   <script src="app.js"></script>
 </body>

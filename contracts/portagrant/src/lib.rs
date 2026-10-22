@@ -1,4 +1,4 @@
-﻿#![cfg_attr(not(feature = "std"), no_std, no_main)]
+#![cfg_attr(not(feature = "std"), no_std, no_main)]
 
 #[ink::contract]
 mod portagrant {
@@ -6,7 +6,10 @@ mod portagrant {
     use ink::storage::Mapping;
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, scale::Encode, scale::Decode)]
-    #[cfg_attr(feature = "std", derive(scale_info::TypeInfo, ink::storage::traits::StorageLayout))]
+    #[cfg_attr(
+        feature = "std",
+        derive(scale_info::TypeInfo, ink::storage::traits::StorageLayout)
+    )]
     pub enum GrantStatus {
         Active,
         Completed,
@@ -14,7 +17,10 @@ mod portagrant {
     }
 
     #[derive(Debug, Clone, PartialEq, Eq, scale::Encode, scale::Decode)]
-    #[cfg_attr(feature = "std", derive(scale_info::TypeInfo, ink::storage::traits::StorageLayout))]
+    #[cfg_attr(
+        feature = "std",
+        derive(scale_info::TypeInfo, ink::storage::traits::StorageLayout)
+    )]
     pub struct Milestone {
         pub amount: Balance,
         pub title: String,
@@ -24,7 +30,10 @@ mod portagrant {
     }
 
     #[derive(Debug, Clone, PartialEq, Eq, scale::Encode, scale::Decode)]
-    #[cfg_attr(feature = "std", derive(scale_info::TypeInfo, ink::storage::traits::StorageLayout))]
+    #[cfg_attr(
+        feature = "std",
+        derive(scale_info::TypeInfo, ink::storage::traits::StorageLayout)
+    )]
     pub struct Grant {
         pub sponsor: AccountId,
         pub builder: AccountId,
@@ -239,11 +248,8 @@ mod portagrant {
             test::set_caller::<ink::env::DefaultEnvironment>(sponsor);
             test::set_value_transferred::<ink::env::DefaultEnvironment>(150);
             let mut contract = PortaGrant::new();
-            let id = contract.create_grant(
-                builder,
-                vec![String::new(), String::new()],
-                vec![100, 50],
-            );
+            let id =
+                contract.create_grant(builder, vec![String::new(), String::new()], vec![100, 50]);
             let milestones = contract.get_milestones(id).unwrap();
             assert_eq!(milestones.len(), 2);
             assert!(milestones[0].title.is_empty());
@@ -270,7 +276,144 @@ mod portagrant {
             contract.approve_milestone(id, 0);
             assert_eq!(contract.get_grant(id).unwrap().status, GrantStatus::Active);
             contract.approve_milestone(id, 1);
-            assert_eq!(contract.get_grant(id).unwrap().status, GrantStatus::Completed);
+            assert_eq!(
+                contract.get_grant(id).unwrap().status,
+                GrantStatus::Completed
+            );
+        }
+
+        fn funded_grant() -> (PortaGrant, u64, AccountId, AccountId) {
+            let (sponsor, builder) = accounts();
+            test::set_caller::<ink::env::DefaultEnvironment>(sponsor);
+            test::set_value_transferred::<ink::env::DefaultEnvironment>(150);
+            let mut contract = PortaGrant::new();
+            let grant_id = contract.create_grant(
+                builder,
+                vec![String::from("Prototype"), String::from("Launch")],
+                vec![100, 50],
+            );
+            (contract, grant_id, sponsor, builder)
+        }
+
+        #[ink::test]
+        #[should_panic]
+        fn rejects_empty_grants() {
+            let (_, builder) = accounts();
+            PortaGrant::new().create_grant(builder, vec![], vec![]);
+        }
+
+        #[ink::test]
+        #[should_panic]
+        fn rejects_mismatched_milestones() {
+            let (_, builder) = accounts();
+            PortaGrant::new().create_grant(builder, vec![String::from("Prototype")], vec![100, 50]);
+        }
+
+        #[ink::test]
+        #[should_panic]
+        fn rejects_zero_amounts() {
+            let (_, builder) = accounts();
+            PortaGrant::new().create_grant(builder, vec![String::from("Prototype")], vec![0]);
+        }
+
+        #[ink::test]
+        #[should_panic]
+        fn rejects_wrong_escrow_total() {
+            let (_, builder) = accounts();
+            test::set_value_transferred::<ink::env::DefaultEnvironment>(99);
+            PortaGrant::new().create_grant(builder, vec![String::from("Prototype")], vec![100]);
+        }
+
+        #[ink::test]
+        #[should_panic(expected = "grant total overflow")]
+        fn rejects_amount_overflow() {
+            let (_, builder) = accounts();
+            PortaGrant::new().create_grant(
+                builder,
+                vec![String::from("First"), String::from("Second")],
+                vec![u128::MAX, 1],
+            );
+        }
+
+        #[ink::test]
+        #[should_panic(expected = "grant id overflow")]
+        fn rejects_grant_id_overflow() {
+            let (_, builder) = accounts();
+            test::set_value_transferred::<ink::env::DefaultEnvironment>(100);
+            let mut contract = PortaGrant::new();
+            contract.next_grant_id = u64::MAX;
+            contract.create_grant(builder, vec![String::from("Prototype")], vec![100]);
+        }
+
+        #[ink::test]
+        #[should_panic]
+        fn only_builder_can_submit_evidence() {
+            let (mut contract, grant_id, _, _) = funded_grant();
+            contract.submit_evidence(grant_id, 0, String::from("ipfs://evidence"));
+        }
+
+        #[ink::test]
+        #[should_panic]
+        fn rejects_blank_evidence() {
+            let (mut contract, grant_id, _, builder) = funded_grant();
+            test::set_caller::<ink::env::DefaultEnvironment>(builder);
+            contract.submit_evidence(grant_id, 0, String::from("   "));
+        }
+
+        #[ink::test]
+        #[should_panic]
+        fn only_sponsor_can_approve() {
+            let (mut contract, grant_id, _, builder) = funded_grant();
+            test::set_caller::<ink::env::DefaultEnvironment>(builder);
+            contract.submit_evidence(grant_id, 0, String::from("ipfs://evidence"));
+            contract.approve_milestone(grant_id, 0);
+        }
+
+        #[ink::test]
+        #[should_panic]
+        fn cannot_approve_without_evidence() {
+            let (mut contract, grant_id, _, _) = funded_grant();
+            contract.approve_milestone(grant_id, 0);
+        }
+
+        #[ink::test]
+        #[should_panic]
+        fn cannot_release_a_milestone_twice() {
+            let (mut contract, grant_id, sponsor, builder) = funded_grant();
+            test::set_caller::<ink::env::DefaultEnvironment>(builder);
+            contract.submit_evidence(grant_id, 0, String::from("ipfs://evidence"));
+            test::set_caller::<ink::env::DefaultEnvironment>(sponsor);
+            contract.approve_milestone(grant_id, 0);
+            contract.approve_milestone(grant_id, 0);
+        }
+
+        #[ink::test]
+        #[should_panic]
+        fn cannot_replace_released_evidence() {
+            let (mut contract, grant_id, sponsor, builder) = funded_grant();
+            test::set_caller::<ink::env::DefaultEnvironment>(builder);
+            contract.submit_evidence(grant_id, 0, String::from("ipfs://evidence"));
+            test::set_caller::<ink::env::DefaultEnvironment>(sponsor);
+            contract.approve_milestone(grant_id, 0);
+            test::set_caller::<ink::env::DefaultEnvironment>(builder);
+            contract.submit_evidence(grant_id, 0, String::from("ipfs://replacement"));
+        }
+
+        #[ink::test]
+        fn release_transfers_only_the_approved_amount() {
+            let (mut contract, grant_id, sponsor, builder) = funded_grant();
+            let initial_balance =
+                test::get_account_balance::<ink::env::DefaultEnvironment>(builder).unwrap_or(0);
+            test::set_caller::<ink::env::DefaultEnvironment>(builder);
+            contract.submit_evidence(grant_id, 0, String::from("ipfs://evidence"));
+            test::set_caller::<ink::env::DefaultEnvironment>(sponsor);
+            contract.approve_milestone(grant_id, 0);
+            assert_eq!(
+                test::get_account_balance::<ink::env::DefaultEnvironment>(builder).unwrap(),
+                initial_balance + 100
+            );
+            assert_eq!(contract.get_grant(grant_id).unwrap().released_count, 1);
+            assert!(!contract.get_milestone(grant_id, 1).unwrap().released);
         }
     }
 }

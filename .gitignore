@@ -1,6 +1,5 @@
 ﻿# Rust
 contracts/portagrant/target/
-contracts/portagrant/Cargo.lock
 
 # Node
 scripts/node_modules/
