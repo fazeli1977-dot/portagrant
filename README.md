@@ -6,6 +6,11 @@ PortaGrant is a milestone-based grant escrow for the Portaldot V3 ecosystem. A s
 
 Public source: https://github.com/fazeli1977-dot/portagrant
 
+October 25 audit: `docs/check-in-audit-2026-10-25.md`.
+Prepared, unsent DoraHacks content: `docs/dorahacks-draft.md`.
+The October 24 check-in deadline has passed; an open final-submission UI does
+not establish permission for a late check-in.
+
 The contract and local dashboard simulation are available for review. The demo
 walks through evidence submission, approval, partial release, completion, and
 reset without sending transactions. **Live testnet deployment and browser
@@ -92,8 +97,9 @@ Open `http://localhost:4173`. The dashboard is an honest demo mode until a contr
 1. Build the WASM and obtain the generated contract metadata JSON.
 2. Copy `scripts/.env.example` to `scripts/.env` and set the RPC endpoint, local signer URI, WASM path, and metadata path.
 3. Install helper dependencies with `cd scripts; npm ci --ignore-scripts`.
-4. Deploy with `npm run deploy`.
-5. Record the real address, constructor hash, interaction hashes, UTC timestamps, signer, and explorer URL in `docs/deployment.md`.
+4. Independently verify and pin `EXPECTED_GENESIS_HASH`, then configure positive gas, storage-deposit and estimated-fee budgets from `scripts/.env.example`. Run `npm run deploy` from `scripts` for read-only preflight (leave `DEPLOY_BROADCAST` unset).
+5. Review constructor execution, funding and costs. Only after explicit approval, set `DEPLOY_BROADCAST=yes` and run `npm run deploy` to sign and broadcast.
+6. Record the real address, constructor hash, interaction hashes, UTC timestamps, signer, and explorer URL in `docs/deployment.md`.
 
 The deployment helper waits for finalization, bounds connection/finality waits,
 and reports public deployment evidence. On timeout, check the chain before retrying.
@@ -106,5 +112,11 @@ The scripts fail closed when required environment values are missing. They do no
 - Development evidence belongs in public Git history; keep at least three dated commits during the Hacker House period.
 - Keep contract address, testnet transactions, architecture, and demo evidence updated before check-in and final submission.
 - Do not claim testnet deployment until the address and transaction hashes are real and verifiable.
+- The initial MVP predates October 14. Four later commits fall within the event window, but commit count does not prove that code was primarily produced during it; organizer eligibility review is needed.
+
+## License
+
+No project license has been selected. Public source availability does not grant
+an open-source license. Obtain the author's decision before adding license terms.
 
 See `docs/submission-checklist.md` for the dated check-in/final requirements and `docs/deployment.md` for the evidence record.

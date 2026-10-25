@@ -6,7 +6,21 @@
 - **Builder**: submits evidence references and receives released funds.
 - **Portaldot contract**: holds escrow, records state, emits evidence/release events, and enforces authorization.
 
-## Flow
+## Implemented local flow
+
+```text
+Browser dashboard -> in-memory simulated milestones and escrow
+                     (no RPC calls, wallet signing or contract writes)
+Node inspect helper -> configured RPC -> existing ink! contract reads
+Node deploy helper -> network/budget gates -> preflight
+                                         -> explicit broadcast -> finalized receipt
+Rust unit tests -> ink! off-chain test environment
+```
+
+The dashboard is not connected to either helper. These paths require configuration
+and do not establish that a live deployment exists.
+
+## Planned browser integration (not implemented)
 
 ```text
 Sponsor/Builder wallet

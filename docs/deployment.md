@@ -9,8 +9,10 @@
 
 ## Testnet deployment
 
-**Not deployed or independently verified.** A compatible Portaldot RPC,
-metadata-bearing contract bundle, and funded testnet signer are still required.
+**No deployment evidence supplied or independently verified.** The metadata-bearing
+bundle exists in artifacts/portagrant.contract. The official RPC responded to
+read-only queries on October 25; a funded signer, independently confirmed network
+identity, reviewed execution budgets and constructor dry-run remain required.
 
 | Network | Contract address | Constructor tx | Finalized block | Explorer |
 |---|---|---|---|---|
@@ -53,6 +55,21 @@ actual fees. Check constructor execution and available balance independently,
 then explicitly approve broadcast. Connection/finality timeouts do not bound
 the node's fee-estimation RPC response time.
 
-The external deployment prerequisite remains unresolved: no verified testnet
-RPC/genesis or funded testnet signer has been supplied. Browser signing is not
-implemented. Neither local validation nor preflight proves a live deployment.
+## Read-only network observation - October 25, 2026
+
+Official endpoint source: https://dorahacks.io/hackathon/portaldot-hacker-house-2026/detail
+
+- Observed at 2026-10-25T18:21:12.443Z using the installed Polkadot API.
+- Endpoint: wss://test-node-v3.portaldot.dev
+- Runtime: portaldot-v3, spec version 3002, transaction version 2.
+- Observed genesis: 0xd4f9acbcf7f52388d8b095abe3c198d19fc510e0343e643e87cfbccb155283bd
+- Observed finalized head: 0x74bbb9f2960d92b6a5c27030deafe96ff76f4d4c2ed28f521a2771b46b3ec1c5
+- Both contracts.instantiateWithCode and contractsApi.call interfaces exist.
+- The SDK warned about unknown signed extensions AuthorizeCall and EthSetOrigin.
+  Review signing compatibility before sending a transaction.
+
+This is a single-node observation, not independent genesis verification, a
+constructor dry-run, a deployment receipt or proof of end-to-end compatibility.
+No signer was used and no transaction was broadcast. Do not copy the observed
+genesis into a trusted pin without independent confirmation. Browser signing
+is not implemented.
